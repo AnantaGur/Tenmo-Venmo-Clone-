@@ -56,8 +56,6 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public boolean create(String username, String password) {
-        final BigDecimal STARTING_BALANCE = new BigDecimal("1000.00");
-        // create user
         String sql = "INSERT INTO tenmo_user (username, password_hash) VALUES (?, ?) RETURNING user_id";
         String password_hash = new BCryptPasswordEncoder().encode(password);
         Integer newUserId;
@@ -66,15 +64,10 @@ public class JdbcUserDao implements UserDao {
         } catch (DataAccessException e) {
             return false;
         }
-
+        loadNewBalance(newUserId);
         // TODO: Create the account record with initial balance
-        User user = new User();
-        String sql2 = "INSERT INTO account (user_id, balance) VALUES (?, ?)";
-        try {
-            Integer newAccountId = jdbcTemplate.queryForObject(sql2, Integer.class, user.getId(), STARTING_BALANCE);
-        } catch (DataAccessException ex){
-            return false;
-        }
+//        User user = new User();
+
 
         return true;
     }
@@ -88,4 +81,17 @@ public class JdbcUserDao implements UserDao {
         user.setAuthorities("USER");
         return user;
     }
+
+    public boolean loadNewBalance(Integer newUserId) {
+        final BigDecimal STARTING_BALANCE = new BigDecimal("1000.00");
+        String sql2 = "INSERT INTO account (user_id, balance) VALUES (?, ?)";
+        try {
+//            Integer newAccountId =
+            jdbcTemplate.queryForObject(sql2, Integer.class, newUserId, STARTING_BALANCE);
+        } catch (DataAccessException ex){
+            return false;
+        }
+        return true;
+    }
+
 }
