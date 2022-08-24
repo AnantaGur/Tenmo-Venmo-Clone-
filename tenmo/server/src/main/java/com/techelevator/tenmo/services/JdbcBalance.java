@@ -5,35 +5,42 @@ import com.techelevator.tenmo.model.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RestBalanceService implements BalanceService{
-    JdbcTemplate jdbcTemplate;
+@Component
+public class JdbcBalance implements BalanceService{
+    JdbcTemplate jdbcTemplate ;
     BalanceDTO balanceDTO;
-    private final String API_URL = "http://localhost:8080/balance";
+
+    public JdbcBalance(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public int findByUsername(String username) {
         String sql = "SELECT user_id, username FROM tenmo_user WHERE username ILIKE ?;";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, username);
         if (rowSet.next()){
-            return mapRowToUser(rowSet).getId();
+            return rowSet.getInt("user_id");
         }
         throw new UsernameNotFoundException("User " + username + " was not found.");
     }
 
-    public List<BigDecimal> getBalance(int userId) throws UsernameNotFoundException {
-        List<BigDecimal> balanceDTOList = new ArrayList<>();
+    public BigDecimal getBalance(int userId) throws UsernameNotFoundException {
+        BigDecimal balance = new BigDecimal("-1");
+        System.out.println(balance);
         String sql = "SELECT balance FROM account WHERE user_id = ?;";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, userId);
-        while (rowSet.next()){
-            balanceDTOList.add(balanceDTO.getBalance());
+        if (rowSet.next()){
+
+            balance = rowSet.getBigDecimal("balance");
+            System.out.println(balance);
         }
-        return balanceDTOList;
+        return balance;
     }
 
 

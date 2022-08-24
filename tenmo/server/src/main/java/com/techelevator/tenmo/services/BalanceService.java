@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface BalanceService {
     int findByUsername(String username);
-    List<BigDecimal> getBalance(int userId);
+    BigDecimal getBalance(int userId);
 }

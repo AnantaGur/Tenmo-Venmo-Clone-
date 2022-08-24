@@ -2,8 +2,7 @@ package com.techelevator.tenmo.controller;
 
 import javax.validation.Valid;
 
-import com.techelevator.tenmo.model.BalanceDTO;
-import com.techelevator.tenmo.services.RestBalanceService;
+import com.techelevator.tenmo.services.JdbcBalance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,7 +36,7 @@ import java.util.List;
 public class AuthenticationController {
 
     @Autowired
-    RestBalanceService restBalanceService;
+    JdbcBalance jdbcBalance;
 
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -75,12 +74,16 @@ public class AuthenticationController {
         }
     }
 
-
+    @PreAuthorize("permitAll")
     @RequestMapping(value = "/balance", method = RequestMethod.GET)
-    public void getBalance(Principal principal) {
+    public BigDecimal getBalance(Principal principal) {
         String userName = principal.getName();
-        int userId = restBalanceService.findByUsername(userName);
-        List<BigDecimal> balance = restBalanceService.getBalance(userId);
+        System.out.println(userName);
+        int userId = jdbcBalance.findByUsername(userName);
+        System.out.println(userId);
+        BigDecimal balance = jdbcBalance.getBalance(userId);
+        System.out.println(balance);
+        return balance;
     }
 
     /**
