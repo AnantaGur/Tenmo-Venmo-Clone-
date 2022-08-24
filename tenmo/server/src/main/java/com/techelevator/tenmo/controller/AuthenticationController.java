@@ -3,6 +3,7 @@ package com.techelevator.tenmo.controller;
 import javax.validation.Valid;
 
 import com.techelevator.tenmo.dao.JdbcBalance;
+import com.techelevator.tenmo.model.TransferDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -77,10 +78,11 @@ public class AuthenticationController {
         return balance;
     }
 
-    @RequestMapping(value = "/transfer/{from_id}/{to_id}", method = RequestMethod.PUT)
-    public boolean transfer(@PathVariable("from_id") int fromId,
-                            @PathVariable("to_id") int toId){
-        return jdbcBalance.transfer(fromId, toId);
+    @RequestMapping(value = "/transfer", method = RequestMethod.PUT)
+    public boolean transfer(@RequestBody TransferDTO transferDTO){
+
+        return jdbcBalance.transfer(transferDTO.getAmount(),
+                transferDTO.getFromId(), transferDTO.getToId());
     }
 
 

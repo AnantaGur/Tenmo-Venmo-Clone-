@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 
 @Component
 public class JdbcBalance implements BalanceDao {
-    JdbcTemplate jdbcTemplate ;
+    JdbcTemplate jdbcTemplate;
 
     public JdbcBalance(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -42,16 +42,23 @@ public class JdbcBalance implements BalanceDao {
 
     @Override
     public boolean transfer(BigDecimal amount, int fromId, int toId) {
-        String sql = "UPDATE transfer SET balance = ? WHERE account_id_from = ?";
-        String sql2 = "UPDATE transfer SET balance = ? WHERE account_id_to = ? ";
+        BigDecimal fromBalance = getBalance(fromId);
+        BigDecimal toBalance = getBalance(toId);
+        if (getBalance(fromId).compareTo(BigDecimal.ZERO) > 0 &&
+        getBalance(fromId).compareTo(amount) > 0) {
+            fromBalance = fromBalance.subtract(amount);
+            toBalance = getBalance(toId).add(amount);
+        }
+        String sql = "UPDATE account SET balance = ? WHERE user_id = ?";
+        String sql2 = "UPDATE account SET balance = ? WHERE user_id = ? ";
         try{
-            jdbcTemplate.update(sql, getBalance(fromId), fromId, toId);
+            jdbcTemplate.update(sql, fromBalance, fromId);
+            jdbcTemplate.update(sql2, toBalance, toId);
         } catch (DataAccessException e){
             return false;
         }
         return true;
     }
-
 
 
 

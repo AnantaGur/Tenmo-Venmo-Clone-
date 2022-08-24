@@ -9,5 +9,4 @@ public interface BalanceDao {
 
     boolean transfer(BigDecimal amount, int fromId, int toId);
 
-    boolean updateTransfer(BigDecimal amount, int fromId, int toId, String status);
 }
