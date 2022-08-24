@@ -3,6 +3,7 @@ package com.techelevator.tenmo.controller;
 import javax.validation.Valid;
 
 import com.techelevator.tenmo.model.BalanceDTO;
+import com.techelevator.tenmo.services.RestBalanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +24,9 @@ import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.security.jwt.TokenProvider;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.List;
 
 /**
  * Controller to authenticate users.
@@ -34,9 +37,7 @@ import java.security.Principal;
 public class AuthenticationController {
 
     @Autowired
-    BalanceDTO balanceDTO;
-
-
+    RestBalanceService restBalanceService;
 
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -78,7 +79,8 @@ public class AuthenticationController {
     @RequestMapping(value = "/balance", method = RequestMethod.GET)
     public void getBalance(Principal principal) {
         String userName = principal.getName();
-        balanceDTO.;
+        int userId = restBalanceService.findByUsername(userName);
+        List<BigDecimal> balance = restBalanceService.getBalance(userId);
     }
 
     /**
