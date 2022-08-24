@@ -66,9 +66,6 @@ public class JdbcUserDao implements UserDao {
         }
         loadNewBalance(newUserId);
         // TODO: Create the account record with initial balance
-//        User user = new User();
-
-
         return true;
     }
 
@@ -82,16 +79,14 @@ public class JdbcUserDao implements UserDao {
         return user;
     }
 
-    public boolean loadNewBalance(Integer newUserId) {
+    public void loadNewBalance(Integer newUserId) {
         final BigDecimal STARTING_BALANCE = new BigDecimal("1000.00");
         String sql2 = "INSERT INTO account (user_id, balance) VALUES (?, ?)";
         try {
-//            Integer newAccountId =
             jdbcTemplate.queryForObject(sql2, Integer.class, newUserId, STARTING_BALANCE);
         } catch (DataAccessException ex){
-            return false;
+            System.out.println("no");
         }
-        return true;
     }
 
 }

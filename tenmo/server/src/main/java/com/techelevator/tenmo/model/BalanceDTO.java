@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/*
 public class BalanceDTO {
 
-    private JdbcTemplate jdbcTemplate;
     private int userId;
     private BigDecimal balance;
 
@@ -33,3 +33,4 @@ public class BalanceDTO {
     }
 
 }
+*/

@@ -2,7 +2,7 @@ package com.techelevator.tenmo.controller;
 
 import javax.validation.Valid;
 
-import com.techelevator.tenmo.services.JdbcBalance;
+import com.techelevator.tenmo.dao.JdbcBalance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,11 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.techelevator.tenmo.dao.UserDao;
 import com.techelevator.tenmo.model.LoginDTO;
@@ -25,7 +21,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.security.Principal;
-import java.util.List;
 
 /**
  * Controller to authenticate users.
@@ -74,17 +69,20 @@ public class AuthenticationController {
         }
     }
 
-    @PreAuthorize("permitAll")
     @RequestMapping(value = "/balance", method = RequestMethod.GET)
     public BigDecimal getBalance(Principal principal) {
         String userName = principal.getName();
-        System.out.println(userName);
         int userId = jdbcBalance.findByUsername(userName);
-        System.out.println(userId);
         BigDecimal balance = jdbcBalance.getBalance(userId);
-        System.out.println(balance);
         return balance;
     }
+
+    @RequestMapping(value = "/transfer/{from_id}/{to_id}", method = RequestMethod.PUT)
+    public boolean transfer(@PathVariable("from_id") int fromId,
+                            @PathVariable("to_id") int toId){
+        return jdbcBalance.transfer(fromId, toId);
+    }
+
 
     /**
      * Object to return as body in JWT Authentication.
