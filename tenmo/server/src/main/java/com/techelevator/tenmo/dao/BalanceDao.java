@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 public interface BalanceDao {
     int findByUsername(String username);
 
+    String findUserById(int userId);
+
     BigDecimal getBalance(int userId);
 
     String transfer(BigDecimal amount, int fromId, int toId);

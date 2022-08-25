@@ -2,17 +2,13 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.DetailDTO;
 import com.techelevator.tenmo.model.TransferDTO;
-import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.UserDTO;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import javax.xml.crypto.Data;
 import java.math.BigDecimal;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +30,13 @@ public class JdbcBalance implements BalanceDao {
             return rowSet.getInt("user_id");
         }
         throw new UsernameNotFoundException("User " + username + " was not found.");
+    }
+
+    @Override
+    public String findUserById(int userId){
+        String sql = "SELECT username FROM tenmo_user WHERE user_id = ?";
+        String userName = jdbcTemplate.queryForObject(sql, String.class, userId);
+        return userName;
     }
 
     @Override
@@ -67,7 +70,6 @@ public class JdbcBalance implements BalanceDao {
         } catch (DataAccessException e){
             return "Rejected";
         }
-
         return "Approved";
     }
 
@@ -92,11 +94,6 @@ public class JdbcBalance implements BalanceDao {
         if (rowSet.next()){
             detailDTO = mapRowToTransferDTODetails(rowSet, user);
         }
-
-/*        detailDTO = mapRowToTransferDTODetails(transferId, userDao.findUserNameById(transferDTO.getFromId()),
-                userDao.findUserNameById(transferDTO.getToId()), transferDTO.getType(),
-                transferDTO.getStatus(), transferDTO.getAmount());*/
-
         return detailDTO;
     }
 
