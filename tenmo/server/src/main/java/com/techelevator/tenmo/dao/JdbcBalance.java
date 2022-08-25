@@ -90,9 +90,11 @@ public class JdbcBalance implements BalanceDao {
         if (rowSet.next()){
             transferDTO = mapRowToTransferDTO(rowSet);
         }
+        System.out.println(transferDTO);
         detailDTO = mapRowToTransferDTODetails(transferId, userDao.findUserNameById(transferDTO.getFromId()),
                 userDao.findUserNameById(transferDTO.getToId()), transferDTO.getType(),
                 transferDTO.getStatus(), transferDTO.getAmount());
+        System.out.println(detailDTO);
         return detailDTO;
     }
 

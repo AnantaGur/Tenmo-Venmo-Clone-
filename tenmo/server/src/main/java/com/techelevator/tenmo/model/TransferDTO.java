@@ -54,4 +54,15 @@ public class TransferDTO {
     public void setType(String type) {
         this.type = type;
     }
+
+    @Override
+    public String toString() {
+        return "TransferDTO{" +
+                "amount=" + amount +
+                ", fromId=" + fromId +
+                ", toId=" + toId +
+                ", status='" + status + '\'' +
+                ", type='" + type + '\'' +
+                '}';
+    }
 }

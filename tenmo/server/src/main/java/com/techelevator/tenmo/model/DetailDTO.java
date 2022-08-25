@@ -57,4 +57,16 @@ public class DetailDTO {
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
+
+    @Override
+    public String toString() {
+        return "DetailDTO{" +
+                "transferId=" + transferId +
+                ", sender='" + sender + '\'' +
+                ", receiver='" + receiver + '\'' +
+                ", type='" + type + '\'' +
+                ", status='" + status + '\'' +
+                ", amount=" + amount +
+                '}';
+    }
 }

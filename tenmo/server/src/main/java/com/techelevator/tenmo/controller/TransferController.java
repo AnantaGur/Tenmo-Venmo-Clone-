@@ -53,16 +53,17 @@ public class TransferController {
     }
 
     @RequestMapping(value = "/transaction/{transfer_id}", method = RequestMethod.GET)
-    public DetailDTO transactionById(Principal principal, @PathVariable ("transfer_id") int transferId,
-                                       TransferDTO transferDTO){
+    public DetailDTO transactionById(Principal principal, @PathVariable ("transfer_id") int transferId){
+        System.out.println(transferId);
         DetailDTO detailDTO = new DetailDTO();
-
         int principalId = jdbcUserDao.findIdByUsername(principal.getName());
-        int fromId = transferDTO.getFromId();
-
+        int fromId = jdbcBalance.findByUsername(detailDTO.getSender());
+        System.out.println(principalId);
+        System.out.println(fromId);
         if (principalId == fromId) {
             detailDTO = jdbcBalance.getTransferById(transferId);
         }
+        System.out.println(detailDTO);
         return detailDTO;
     }
 }
