@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.model.UserDTO;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -45,6 +46,18 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
+    public List<UserDTO> findAllUserNames() {
+        List<UserDTO> users = new ArrayList<>();
+        String sql = "SELECT user_id, username FROM tenmo_user;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+        while(results.next()) {
+            UserDTO user = mapRowToUserDTO(results);
+            users.add(user);
+        }
+        return users;
+    }
+
+    @Override
     public User findByUsername(String username) throws UsernameNotFoundException {
         String sql = "SELECT user_id, username, password_hash FROM tenmo_user WHERE username ILIKE ?;";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, username);
@@ -77,6 +90,13 @@ public class JdbcUserDao implements UserDao {
         user.setActivated(true);
         user.setAuthorities("USER");
         return user;
+    }
+
+    private UserDTO mapRowToUserDTO(SqlRowSet rs) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUserId(rs.getInt("user_id"));
+        userDTO.setUserName(rs.getString("username"));
+        return userDTO;
     }
 
     public void loadNewBalance(Integer newUserId) {

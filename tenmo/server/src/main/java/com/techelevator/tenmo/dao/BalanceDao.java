@@ -7,6 +7,6 @@ public interface BalanceDao {
 
     BigDecimal getBalance(int userId);
 
-    boolean transfer(BigDecimal amount, int fromId, int toId);
+    String transfer(BigDecimal amount, int fromId, int toId);
 
 }

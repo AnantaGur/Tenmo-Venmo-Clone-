@@ -3,7 +3,8 @@ package com.techelevator.tenmo.controller;
 import javax.validation.Valid;
 
 import com.techelevator.tenmo.dao.JdbcBalance;
-import com.techelevator.tenmo.model.TransferDTO;
+import com.techelevator.tenmo.dao.JdbcUserDao;
+import com.techelevator.tenmo.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,14 +15,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.techelevator.tenmo.dao.UserDao;
-import com.techelevator.tenmo.model.LoginDTO;
-import com.techelevator.tenmo.model.RegisterUserDTO;
-import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.security.jwt.TokenProvider;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.List;
 
 /**
  * Controller to authenticate users.
@@ -33,6 +32,8 @@ public class AuthenticationController {
 
     @Autowired
     JdbcBalance jdbcBalance;
+    @Autowired
+    JdbcUserDao jdbcUserDao;
 
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -79,13 +80,15 @@ public class AuthenticationController {
     }
 
     @RequestMapping(value = "/transfer", method = RequestMethod.PUT)
-    public boolean transfer(@RequestBody TransferDTO transferDTO){
-
+    public String transfer(@RequestBody TransferDTO transferDTO){
         return jdbcBalance.transfer(transferDTO.getAmount(),
                 transferDTO.getFromId(), transferDTO.getToId());
     }
 
-
+    @RequestMapping(value = "/listUsers", method = RequestMethod.GET)
+    public List<UserDTO> listAllUsers(){
+        return jdbcUserDao.findAllUserNames();
+    }
     /**
      * Object to return as body in JWT Authentication.
      */

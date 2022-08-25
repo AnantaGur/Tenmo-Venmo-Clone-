@@ -41,11 +41,11 @@ public class JdbcBalance implements BalanceDao {
     }
 
     @Override
-    public boolean transfer(BigDecimal amount, int fromId, int toId) {
+    public String transfer(BigDecimal amount, int fromId, int toId) {
         BigDecimal fromBalance = getBalance(fromId);
         BigDecimal toBalance = getBalance(toId);
         if (getBalance(fromId).compareTo(BigDecimal.ZERO) > 0 &&
-        getBalance(fromId).compareTo(amount) > 0) {
+        getBalance(fromId).compareTo(amount) > 0 && fromId != toId) {
             fromBalance = fromBalance.subtract(amount);
             toBalance = getBalance(toId).add(amount);
         }
@@ -55,9 +55,10 @@ public class JdbcBalance implements BalanceDao {
             jdbcTemplate.update(sql, fromBalance, fromId);
             jdbcTemplate.update(sql2, toBalance, toId);
         } catch (DataAccessException e){
-            return false;
+            return "Rejected";
         }
-        return true;
+
+        return "Approved";
     }
 
 
