@@ -71,31 +71,6 @@ public class AuthenticationController {
         }
     }
 
-    @RequestMapping(value = "/balance", method = RequestMethod.GET)
-    public BigDecimal getBalance(Principal principal) {
-        String userName = principal.getName();
-        int userId = jdbcBalance.findByUsername(userName);
-        BigDecimal balance = jdbcBalance.getBalance(userId);
-        return balance;
-    }
-
-    @PreAuthorize("hasRole('ROLE_USER')")
-    @RequestMapping(value = "/transfer")
-    public String transfer(Principal principal, @RequestBody TransferDTO transferDTO) {
-        UserDTO userDTO = new UserDTO();
-        int principalId = jdbcUserDao.findIdByUsername(principal.getName());
-        int fromId = transferDTO.getFromId();
-        if (principalId == fromId) {
-            return jdbcBalance.transfer(transferDTO.getAmount(),
-                    transferDTO.getFromId(), transferDTO.getToId());
-        }
-        return "REJECTED";
-    }
-
-    @RequestMapping(value = "/listUsers", method = RequestMethod.GET)
-    public List<UserDTO> listAllUsers(){
-        return jdbcUserDao.findAllUserNames();
-    }
     /**
      * Object to return as body in JWT Authentication.
      */

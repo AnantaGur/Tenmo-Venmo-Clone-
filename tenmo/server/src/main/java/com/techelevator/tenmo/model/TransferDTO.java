@@ -12,6 +12,9 @@ public class TransferDTO {
 
     private String status;
 
+    private String type;
+
+
     public BigDecimal getAmount() {
         return amount;
     }
@@ -42,5 +45,13 @@ public class TransferDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
