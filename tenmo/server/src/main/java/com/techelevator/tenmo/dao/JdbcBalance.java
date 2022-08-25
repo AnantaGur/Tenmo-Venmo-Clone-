@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.xml.crypto.Data;
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,20 +82,21 @@ public class JdbcBalance implements BalanceDao {
         return transferDTOList;
     }
 
-    public DetailDTO getTransferById(int transferId){
-        TransferDTO transferDTO = new TransferDTO();
+    public DetailDTO getTransferById(int transferId, String user){
         DetailDTO detailDTO = new DetailDTO();
-        String sql = "SELECT user_id_from, user_id_to, amount, status, type FROM transfer " +
+        String sql = "SELECT transfer_id, username, amount, status, type " +
+                "FROM transfer " +
+                "JOIN tenmo_user ON transfer.user_id_to = tenmo_user.user_id " +
                 "WHERE transfer_id = ?";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, transferId);
         if (rowSet.next()){
-            transferDTO = mapRowToTransferDTO(rowSet);
+            detailDTO = mapRowToTransferDTODetails(rowSet, user);
         }
-        System.out.println(transferDTO);
-        detailDTO = mapRowToTransferDTODetails(transferId, userDao.findUserNameById(transferDTO.getFromId()),
+
+/*        detailDTO = mapRowToTransferDTODetails(transferId, userDao.findUserNameById(transferDTO.getFromId()),
                 userDao.findUserNameById(transferDTO.getToId()), transferDTO.getType(),
-                transferDTO.getStatus(), transferDTO.getAmount());
-        System.out.println(detailDTO);
+                transferDTO.getStatus(), transferDTO.getAmount());*/
+
         return detailDTO;
     }
 
@@ -108,15 +110,14 @@ public class JdbcBalance implements BalanceDao {
         return transferDTO;
     }
 
-    private DetailDTO mapRowToTransferDTODetails(int id, String sender, String receiver, String type,
-                                                 String status, BigDecimal amount){
+    private DetailDTO mapRowToTransferDTODetails(SqlRowSet rs, String user){
         DetailDTO detailDTO = new DetailDTO();
-        detailDTO.setTransferId(id);
-        detailDTO.setSender(sender);
-        detailDTO.setReceiver(receiver);
-        detailDTO.setType(type);
-        detailDTO.setStatus(status);
-        detailDTO.setAmount(amount);
+        detailDTO.setTransferId(rs.getInt("transfer_id"));
+        detailDTO.setSender(user);
+        detailDTO.setReceiver(rs.getString("username"));
+        detailDTO.setType(rs.getString("type"));
+        detailDTO.setStatus(rs.getString("status"));
+        detailDTO.setAmount(rs.getBigDecimal("amount"));
         return detailDTO;
     }
 }

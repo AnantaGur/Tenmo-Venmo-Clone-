@@ -57,13 +57,13 @@ public class TransferController {
         System.out.println(transferId);
         DetailDTO detailDTO = new DetailDTO();
         int principalId = jdbcUserDao.findIdByUsername(principal.getName());
-        int fromId = jdbcBalance.findByUsername(detailDTO.getSender());
         System.out.println(principalId);
-        System.out.println(fromId);
-        if (principalId == fromId) {
-            detailDTO = jdbcBalance.getTransferById(transferId);
-        }
-        System.out.println(detailDTO);
+//        int fromId = jdbcBalance.findByUsername(detailDTO.getSender());
+//        System.out.println(fromId);
+//        if (principalId == fromId) {
+            detailDTO = jdbcBalance.getTransferById(transferId, principal.getName());
+  //      }
+
         return detailDTO;
     }
 }
