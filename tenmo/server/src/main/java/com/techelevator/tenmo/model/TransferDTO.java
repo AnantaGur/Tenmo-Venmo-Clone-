@@ -5,15 +5,22 @@ import java.math.BigDecimal;
 public class TransferDTO {
 
     private BigDecimal amount;
-
     private int fromId;
-
     private int toId;
-
     private String status;
-
     private String type;
 
+    public TransferDTO(BigDecimal amount, int fromId, int toId, String status, String type) {
+        this.amount = amount;
+        this.fromId = fromId;
+        this.toId = toId;
+        this.status = status;
+        this.type = type;
+    }
+
+    public TransferDTO(){
+
+    }
 
     public BigDecimal getAmount() {
         return amount;

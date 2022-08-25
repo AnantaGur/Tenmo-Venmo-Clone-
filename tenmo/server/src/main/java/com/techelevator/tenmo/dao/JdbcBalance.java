@@ -86,13 +86,12 @@ public class JdbcBalance implements BalanceDao {
 
     public DetailDTO getTransferById(int transferId, String user){
         DetailDTO detailDTO = new DetailDTO();
-        String sql = "SELECT transfer_id, username, amount, status, type " +
+        String sql = "SELECT transfer_id, user_id_from, user_id_to, amount, status, type " +
                 "FROM transfer " +
-                "JOIN tenmo_user ON transfer.user_id_to = tenmo_user.user_id " +
                 "WHERE transfer_id = ?";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, transferId);
         if (rowSet.next()){
-            detailDTO = mapRowToTransferDTODetails(rowSet, user);
+            detailDTO = mapRowToTransferDTODetails(rowSet,user);
         }
         return detailDTO;
     }
@@ -109,9 +108,14 @@ public class JdbcBalance implements BalanceDao {
 
     private DetailDTO mapRowToTransferDTODetails(SqlRowSet rs, String user){
         DetailDTO detailDTO = new DetailDTO();
+//        String sql = "SELECT transfer_id, username, amount, status, type " +
+//                "FROM transfer " +
+//                "JOIN tenmo_user ON transfer.user_id_from = tenmo_user.user_id " +
+//                "WHERE transfer_id = ?";
+//        String fromName = jdbcTemplate.queryForObject(sql, String.class, rs.getInt("transfer_id"));
         detailDTO.setTransferId(rs.getInt("transfer_id"));
-        detailDTO.setSender(user);
-        detailDTO.setReceiver(rs.getString("username"));
+        detailDTO.setSender(findUserById(rs.getInt("user_id_from")));
+        detailDTO.setReceiver(findUserById(rs.getInt("user_id_to")));
         detailDTO.setType(rs.getString("type"));
         detailDTO.setStatus(rs.getString("status"));
         detailDTO.setAmount(rs.getBigDecimal("amount"));

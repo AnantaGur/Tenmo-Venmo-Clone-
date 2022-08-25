@@ -3,12 +3,15 @@ package com.techelevator.tenmo.dao;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserDTO;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.xml.crypto.Data;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,31 +37,12 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
-    public String findUserNameById(int userId) {
-        String sql = "SELECT username FROM tenmo_user WHERE user_id = ?";
-        String userName = jdbcTemplate.queryForObject(sql, String.class, userId);
-        return userName;
-    }
-
-    @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT user_id, username, password_hash FROM tenmo_user;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
         while(results.next()) {
             User user = mapRowToUser(results);
-            users.add(user);
-        }
-        return users;
-    }
-
-    @Override
-    public List<UserDTO> findAllUserNames() {
-        List<UserDTO> users = new ArrayList<>();
-        String sql = "SELECT user_id, username FROM tenmo_user;";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-        while(results.next()) {
-            UserDTO user = mapRowToUserDTO(results);
             users.add(user);
         }
         return users;
@@ -81,11 +65,46 @@ public class JdbcUserDao implements UserDao {
         Integer newUserId;
         try {
             newUserId = jdbcTemplate.queryForObject(sql, Integer.class, username, password_hash);
+            loadNewBalance(newUserId);
         } catch (DataAccessException e) {
             return false;
         }
-        loadNewBalance(newUserId);
+
         // TODO: Create the account record with initial balance
+/*        if (!) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User registration failed.");
+        }*/
+        return true;
+    }
+
+    @Override
+    public List<UserDTO> findAllUserNames() {
+        List<UserDTO> users = new ArrayList<>();
+        String sql = "SELECT user_id, username FROM tenmo_user;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+        while(results.next()) {
+            UserDTO user = mapRowToUserDTO(results);
+            users.add(user);
+        }
+        return users;
+    }
+
+    @Override
+    public String findUserNameById(int userId) {
+        String sql = "SELECT username FROM tenmo_user WHERE user_id = ?";
+        String userName = jdbcTemplate.queryForObject(sql, String.class, userId);
+        return userName;
+    }
+
+    public boolean loadNewBalance(Integer newUserId) {
+        final BigDecimal STARTING_BALANCE = new BigDecimal("1000.00");
+        String sql2 = "INSERT INTO account (user_id, balance) VALUES (?, ?)";
+        try {
+            Integer x = jdbcTemplate.queryForObject(sql2, Integer.class, newUserId, STARTING_BALANCE);
+        } catch (DataAccessException ex){
+            System.out.println("no");
+            return false;
+        }
         return true;
     }
 
@@ -105,15 +124,4 @@ public class JdbcUserDao implements UserDao {
         userDTO.setUserName(rs.getString("username"));
         return userDTO;
     }
-
-    public void loadNewBalance(Integer newUserId) {
-        final BigDecimal STARTING_BALANCE = new BigDecimal("1000.00");
-        String sql2 = "INSERT INTO account (user_id, balance) VALUES (?, ?)";
-        try {
-            jdbcTemplate.queryForObject(sql2, Integer.class, newUserId, STARTING_BALANCE);
-        } catch (DataAccessException ex){
-            System.out.println("no");
-        }
-    }
-
 }

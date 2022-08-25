@@ -7,6 +7,15 @@ public class UserDTO {
     private int userId;
     private String userName;
 
+    public UserDTO(int userId, String userName) {
+        this.userId = userId;
+        this.userName = userName;
+    }
+
+    public UserDTO(){
+
+    }
+
     public int getUserId() {
         return userId;
     }
@@ -23,4 +32,11 @@ public class UserDTO {
         this.userName = userName;
     }
 
+    @Override
+    public String toString() {
+        return "UserDTO{" +
+                "userId=" + userId +
+                ", userName='" + userName + '\'' +
+                '}';
+    }
 }
