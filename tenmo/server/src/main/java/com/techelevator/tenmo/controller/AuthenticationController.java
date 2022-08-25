@@ -79,10 +79,17 @@ public class AuthenticationController {
         return balance;
     }
 
-    @RequestMapping(value = "/transfer", method = RequestMethod.PUT)
-    public String transfer(@RequestBody TransferDTO transferDTO){
-        return jdbcBalance.transfer(transferDTO.getAmount(),
-                transferDTO.getFromId(), transferDTO.getToId());
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @RequestMapping(value = "/transfer")
+    public String transfer(Principal principal, @RequestBody TransferDTO transferDTO) {
+        UserDTO userDTO = new UserDTO();
+        int principalId = jdbcUserDao.findIdByUsername(principal.getName());
+        int fromId = transferDTO.getFromId();
+        if (principalId == fromId) {
+            return jdbcBalance.transfer(transferDTO.getAmount(),
+                    transferDTO.getFromId(), transferDTO.getToId());
+        }
+        return "REJECTED";
     }
 
     @RequestMapping(value = "/listUsers", method = RequestMethod.GET)

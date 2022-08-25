@@ -51,22 +51,16 @@ public class JdbcBalance implements BalanceDao {
         }
         String sql = "UPDATE account SET balance = ? WHERE user_id = ?";
         String sql2 = "UPDATE account SET balance = ? WHERE user_id = ? ";
+        String sql3 = "INSERT INTO transfer (user_id_from, user_id_to, amount, status) " +
+                "VALUES (?, ?, ?, 'APPROVED')";
         try{
             jdbcTemplate.update(sql, fromBalance, fromId);
             jdbcTemplate.update(sql2, toBalance, toId);
+            jdbcTemplate.update(sql3, fromId, toId, amount);
         } catch (DataAccessException e){
             return "Rejected";
         }
 
         return "Approved";
-    }
-
-
-
-    private User mapRowToUser(SqlRowSet rs) {
-        User user = new User();
-        user.setId(rs.getInt("user_id"));
-        user.setUsername(rs.getString("username"));
-        return user;
     }
 }
