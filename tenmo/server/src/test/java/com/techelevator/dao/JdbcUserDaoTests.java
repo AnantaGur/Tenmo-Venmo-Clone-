@@ -15,12 +15,6 @@ import java.util.List;
 
 public class JdbcUserDaoTests extends BaseDaoTests{
 
-//    private static final User USER_1 = new User(1003, "JJ", "JJ");
-//    private static final User USER_2 =
-//            new User(1002, "AA", "AA");
-//    private static final User USER_3 =
-//            new User(1002, "XX", "XX");
-
     private JdbcUserDao sut;
 
     @Before
@@ -67,12 +61,12 @@ public class JdbcUserDaoTests extends BaseDaoTests{
 
     @Test
     public void return_userList(){
-        List<UserDTO> expected = sut.findAllUserNames();
         List<UserDTO> actual = new ArrayList<>();
         UserDTO user1 = new UserDTO(1001, "bob");
         actual.add(user1);
         UserDTO user2 = new UserDTO(1002, "user");
         actual.add(user2);
-        Assert.assertEquals(expected, actual);
+        List<UserDTO> expected = sut.findAllUserNames();
+        Assert.assertEquals(expected.toString(), actual.toString());
     }
 }

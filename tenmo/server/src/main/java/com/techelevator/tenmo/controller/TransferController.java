@@ -25,7 +25,7 @@ public class TransferController {
     @RequestMapping(value = "/balance", method = RequestMethod.GET)
     public BigDecimal getBalance(Principal principal) {
         String userName = principal.getName();
-        int userId = jdbcBalance.findByUsername(userName);
+        int userId = jdbcUserDao.findIdByUsername(userName);
         BigDecimal balance = jdbcBalance.getBalance(userId);
         return balance;
     }
@@ -57,7 +57,7 @@ public class TransferController {
         System.out.println(detailDTO.getTransferId());
 
         int principalId = jdbcUserDao.findIdByUsername(principal.getName());
-        int fromId = jdbcBalance.findByUsername(principal.getName());
+        int fromId = jdbcUserDao.findIdByUsername(principal.getName());
 
         if (principalId == fromId) {
             detailDTO = jdbcBalance.getTransferById(detailDTO.getTransferId(), principal.getName());

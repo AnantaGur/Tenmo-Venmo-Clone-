@@ -12,24 +12,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Component
 public class JdbcBalance implements BalanceDao {
-    JdbcTemplate jdbcTemplate;
-    JdbcUserDao userDao;
+
+    private JdbcTemplate jdbcTemplate;
 
     public JdbcBalance(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-    }
-
-    @Override
-    public int findByUsername(String username) {
-        String sql = "SELECT user_id, username FROM tenmo_user WHERE username ILIKE ?;";
-        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, username);
-        if (rowSet.next()){
-            return rowSet.getInt("user_id");
-        }
-        throw new UsernameNotFoundException("User " + username + " was not found.");
     }
 
     @Override

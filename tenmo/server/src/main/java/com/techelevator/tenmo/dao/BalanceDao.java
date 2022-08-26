@@ -7,7 +7,6 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import java.math.BigDecimal;
 
 public interface BalanceDao {
-    int findByUsername(String username);
 
     String findUserById(int userId);
 
