@@ -18,4 +18,6 @@ public interface UserDao {
     String findUserNameById(int userId);
 
     boolean create(String username, String password);
+
+    void loadNewBalance(int newUserId);
 }

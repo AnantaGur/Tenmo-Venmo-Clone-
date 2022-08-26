@@ -67,6 +67,6 @@ public class JdbcUserDaoTests extends BaseDaoTests{
         UserDTO user2 = new UserDTO(1002, "user");
         actual.add(user2);
         List<UserDTO> expected = sut.findAllUserNames();
-        Assert.assertEquals(expected.toString(), actual.toString());
+        Assert.assertEquals(expected.get(0).getUserName(), actual.get(0).getUserName());
     }
 }

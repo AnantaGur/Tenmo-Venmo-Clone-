@@ -69,11 +69,7 @@ public class JdbcUserDao implements UserDao {
         } catch (DataAccessException e) {
             return false;
         }
-
         // TODO: Create the account record with initial balance
-/*        if (!) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User registration failed.");
-        }*/
         return true;
     }
 
@@ -92,20 +88,18 @@ public class JdbcUserDao implements UserDao {
     @Override
     public String findUserNameById(int userId) {
         String sql = "SELECT username FROM tenmo_user WHERE user_id = ?";
-        String userName = jdbcTemplate.queryForObject(sql, String.class, userId);
-        return userName;
+        return jdbcTemplate.queryForObject(sql, String.class, userId);
     }
 
-    public boolean loadNewBalance(Integer newUserId) {
-        final BigDecimal STARTING_BALANCE = new BigDecimal("1000.00");
-        String sql2 = "INSERT INTO account (user_id, balance) VALUES (?, ?)";
+    @Override
+    public void loadNewBalance(int newUserId){
+        BigDecimal STARTING_BALANCE = new BigDecimal("1000.00");
+        String sql = "INSERT INTO account (user_id, balance) VALUES (?, ?)";
         try {
-            Integer x = jdbcTemplate.queryForObject(sql2, Integer.class, newUserId, STARTING_BALANCE);
-        } catch (DataAccessException ex){
-            System.out.println("no");
-            return false;
+            jdbcTemplate.update(sql, newUserId, STARTING_BALANCE);
+        } catch(DataAccessException ex) {
+            System.out.println("DATA ACCESS EXCEPTION");
         }
-        return true;
     }
 
     private User mapRowToUser(SqlRowSet rs) {

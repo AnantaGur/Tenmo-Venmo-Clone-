@@ -1,6 +1,5 @@
 package com.techelevator.tenmo.model;
 
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 public class UserDTO {
 

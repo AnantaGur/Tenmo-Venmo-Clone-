@@ -26,14 +26,14 @@ public class TransferController {
     public BigDecimal getBalance(Principal principal) {
         String userName = principal.getName();
         int userId = jdbcUserDao.findIdByUsername(userName);
-        BigDecimal balance = jdbcBalance.getBalance(userId);
-        return balance;
+        return jdbcBalance.getBalance(userId);
     }
 
     @RequestMapping(value = "/transfer")
     public String transfer(Principal principal, @RequestBody TransferDTO transferDTO) {
         int principalId = jdbcUserDao.findIdByUsername(principal.getName());
         int fromId = transferDTO.getFromId();
+
         if (principalId == fromId) {
             return jdbcBalance.transfer(transferDTO.getAmount(),
                     transferDTO.getFromId(), transferDTO.getToId());
@@ -49,20 +49,17 @@ public class TransferController {
     @RequestMapping(value = "/listTransactions", method = RequestMethod.GET)
     public List<TransferDTO> listOfTransactions(Principal principal){
         int principalId = jdbcUserDao.findIdByUsername(principal.getName());
-        return jdbcBalance.getTransfersById(principalId);
+        return jdbcBalance.getListTransfersById(principalId);
     }
 
     @RequestMapping(value = "/transaction", method = RequestMethod.GET)
     public DetailDTO transactionById(Principal principal, @RequestBody DetailDTO detailDTO){
-        System.out.println(detailDTO.getTransferId());
-
         int principalId = jdbcUserDao.findIdByUsername(principal.getName());
         int fromId = jdbcUserDao.findIdByUsername(principal.getName());
 
         if (principalId == fromId) {
             detailDTO = jdbcBalance.getTransferById(detailDTO.getTransferId(), principal.getName());
         }
-
         return detailDTO;
     }
 }

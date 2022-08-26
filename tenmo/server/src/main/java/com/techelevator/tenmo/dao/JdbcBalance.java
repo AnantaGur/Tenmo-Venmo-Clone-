@@ -15,7 +15,7 @@ import java.util.List;
 @Component
 public class JdbcBalance implements BalanceDao {
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     public JdbcBalance(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -24,8 +24,7 @@ public class JdbcBalance implements BalanceDao {
     @Override
     public String findUserById(int userId){
         String sql = "SELECT username FROM tenmo_user WHERE user_id = ?";
-        String userName = jdbcTemplate.queryForObject(sql, String.class, userId);
-        return userName;
+        return jdbcTemplate.queryForObject(sql, String.class, userId);
     }
 
     @Override
@@ -33,6 +32,7 @@ public class JdbcBalance implements BalanceDao {
         BigDecimal balance = new BigDecimal("-1");
         String sql = "SELECT balance FROM account WHERE user_id = ?;";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, userId);
+
         if (rowSet.next()){
             balance = rowSet.getBigDecimal("balance");
         }
@@ -43,26 +43,29 @@ public class JdbcBalance implements BalanceDao {
     public String transfer(BigDecimal amount, int fromId, int toId) {
         BigDecimal fromBalance = getBalance(fromId);
         BigDecimal toBalance = getBalance(toId);
+
         if (getBalance(fromId).compareTo(BigDecimal.ZERO) > 0 &&
         getBalance(fromId).compareTo(amount) > 0 && fromId != toId) {
             fromBalance = fromBalance.subtract(amount);
-            toBalance = getBalance(toId).add(amount);
+            toBalance = toBalance.add(amount);
+
+            String sql = "UPDATE account SET balance = ? WHERE user_id = ?";
+            String sql2 = "UPDATE account SET balance = ? WHERE user_id = ? ";
+            String sql3 = "INSERT INTO transfer (user_id_from, user_id_to, amount, status, type) " +
+                    "VALUES (?, ?, ?, 'APPROVED', 'SEND')";
+            try{
+                jdbcTemplate.update(sql, fromBalance, fromId);
+                jdbcTemplate.update(sql2, toBalance, toId);
+                jdbcTemplate.update(sql3, fromId, toId, amount);
+            } catch (DataAccessException e){
+                return "DATABASE CANNOT BE REACHED";
+            }
+            return "APPROVED";
         }
-        String sql = "UPDATE account SET balance = ? WHERE user_id = ?";
-        String sql2 = "UPDATE account SET balance = ? WHERE user_id = ? ";
-        String sql3 = "INSERT INTO transfer (user_id_from, user_id_to, amount, status, type) " +
-                "VALUES (?, ?, ?, 'APPROVED', 'SEND')";
-        try{
-            jdbcTemplate.update(sql, fromBalance, fromId);
-            jdbcTemplate.update(sql2, toBalance, toId);
-            jdbcTemplate.update(sql3, fromId, toId, amount);
-        } catch (DataAccessException e){
-            return "Rejected";
-        }
-        return "Approved";
+        return "REJECTED";
     }
 
-    public List<TransferDTO> getTransfersById(int userId){
+    public List<TransferDTO> getListTransfersById(int userId){
         List<TransferDTO> transferDTOList = new ArrayList<>();
         String sql = "SELECT user_id_from, user_id_to, amount, status, type FROM  transfer " +
                 "WHERE user_id_from = ?";
@@ -97,11 +100,6 @@ public class JdbcBalance implements BalanceDao {
 
     private DetailDTO mapRowToTransferDTODetails(SqlRowSet rs, String user){
         DetailDTO detailDTO = new DetailDTO();
-//        String sql = "SELECT transfer_id, username, amount, status, type " +
-//                "FROM transfer " +
-//                "JOIN tenmo_user ON transfer.user_id_from = tenmo_user.user_id " +
-//                "WHERE transfer_id = ?";
-//        String fromName = jdbcTemplate.queryForObject(sql, String.class, rs.getInt("transfer_id"));
         detailDTO.setTransferId(rs.getInt("transfer_id"));
         detailDTO.setSender(findUserById(rs.getInt("user_id_from")));
         detailDTO.setReceiver(findUserById(rs.getInt("user_id_to")));
