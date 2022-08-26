@@ -68,8 +68,8 @@ public class JdbcBalance implements BalanceDao {
     public List<TransferDTO> getListTransfersById(int userId){
         List<TransferDTO> transferDTOList = new ArrayList<>();
         String sql = "SELECT user_id_from, user_id_to, amount, status, type FROM  transfer " +
-                "WHERE user_id_from = ?";
-        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, userId);
+                "WHERE user_id_from = ? OR user_id_to = ?";
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, userId, userId);
         while (rowSet.next()){
             transferDTOList.add(mapRowToTransferDTO(rowSet));
         }
